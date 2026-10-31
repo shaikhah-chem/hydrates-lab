@@ -51,13 +51,14 @@ input[type=number]{width:100px;font:800 1.4rem Tajawal,sans-serif;text-align:cen
 .btn2{background:var(--orange);color:#fff;border:0;border-radius:999px;padding:12px 32px;font:800 1.3rem Tajawal,sans-serif;cursor:pointer;box-shadow:0 4px 0 #B95E2A}
 .btn2.teal{background:var(--teal);box-shadow:0 4px 0 #1E6F6F}
 .bars{display:grid;gap:12px;margin:10px auto 18px;max-width:820px}
-.bar{display:grid;grid-template-columns:110px 1fr 70px;align-items:center;gap:12px;font-weight:800;font-size:1.2rem}
+.row{display:flex;justify-content:space-between;align-items:center;background:var(--lteal);border-radius:14px;padding:10px 18px;font-weight:800;font-size:1.25rem}
 .track{height:30px;background:#EEF2F4;border-radius:999px;overflow:hidden}
 .fill{height:100%;width:0;border-radius:999px;transition:width 1.2s}
 .big{font-size:4.2rem;font-weight:800;text-align:center;color:var(--teal);margin:0}
 .msg{text-align:center;font-size:1.5rem;font-weight:800;margin:4px 0 18px}
 .hide{display:none!important}
 canvas#cf{position:fixed;inset:0;pointer-events:none}
+[dir=rtl] .big{direction:ltr}
 @media (max-width:760px){.opts{grid-template-columns:1fr}.qt{font-size:1.4rem}.opt{font-size:1.15rem}h1{font-size:1.6rem}}
 </style>
 </head>
@@ -71,9 +72,8 @@ canvas#cf{position:fixed;inset:0;pointer-events:none}
     <div class="steps">
       <div><b>1</b>اقرئي السؤال… لديكِ 10 ثوانٍ للتفكير وحدكِ.</div>
       <div><b>2</b>ارفعي أصابعكِ برمز الإجابة (أ، ب، ج، د).</div>
-      <div><b>3</b>شاهدي التغذية الراجعة، وفي النهاية نسبة نجاح الفصل.</div>
+      <div><b>3</b>تضغط المعلمة إجابة الفصل… ونشاهد التغذية الراجعة، وفي النهاية نتيجة الفصل.</div>
     </div>
-    <div class="size">عدد طالبات الفصل: <input type="number" id="n" value="30" min="1" max="60"></div>
     <button class="go" id="go">ابدئي التقويم ◀</button>
   </section>
   <!-- question -->
@@ -85,8 +85,6 @@ canvas#cf{position:fixed;inset:0;pointer-events:none}
     <div class="opts" id="opts"></div>
     <div class="fb" id="fb"></div>
     <div class="ctrl">
-      <div class="count" id="count">كم طالبة أجابت صحيحاً؟
-        <button id="minus">−</button><input type="number" id="c" value="0" min="0"><button id="plus">+</button></div>
       <div style="margin-inline-start:auto;display:flex;gap:10px">
         <button class="btn2" id="show">اكشفي الإجابة</button>
         <button class="btn2 teal hide" id="next">السؤال التالي ◀</button>
@@ -95,8 +93,8 @@ canvas#cf{position:fixed;inset:0;pointer-events:none}
   </section>
   <!-- result -->
   <section class="panel hide" id="res">
-    <h1>نسبة نجاح الفصل</h1>
-    <p class="big" id="pct">0%</p>
+    <h1>نتيجة الفصل</h1>
+    <p class="big" id="pct">0 / 5</p>
     <p class="msg" id="msg"></p>
     <div class="bars" id="bars"></div>
     <button class="go" id="again">إعادة التقويم ↺</button>
@@ -111,9 +109,9 @@ const Q = [
   {q: 'يمكن إزالة ماء التبلور في الملح المائي عن طريق:',
    o: ['الترسيب', 'التحليل', 'الذوبان', 'التسخين'], a: 3,
    fb: 'بتسخين الملح المائي تُطرد جزيئات الماء تاركةً وراءها الملح اللامائي (الشكل 5-6).'},
-  {q: 'كتلة عيّنة من <span class="f">BaCl<sub>2</sub>·xH<sub>2</sub>O</span> هي <span class="f">5.00 g</span>، وبعد التسخين أصبحت <span class="f">4.26 g</span>. كتلة الماء المفقود:',
-   o: ['<span class="f">4.26 g</span>', '<span class="f">0.74 g</span>', '<span class="f">9.26 g</span>', '<span class="f">5.00 g</span>'], a: 1,
-   fb: 'كتلة الماء = كتلة الملح المائي − كتلة الملح اللامائي = <span class="f">5.00 − 4.26 = 0.74 g</span>، ومنها نصل إلى <span class="f">BaCl<sub>2</sub>·2H<sub>2</sub>O</span>.'},
+  {q: 'ما كتلة الماء بالجرام في عيّنة من ملح مائي كتلتها <span class="f">10 g</span>، تم تسخينها حتى تغيّر لونها وأصبحت كتلتها <span class="f">9.2 g</span>؟',
+   o: ['<span class="f">0.8</span>', '<span class="f">8</span>', '<span class="f">9.2</span>', '<span class="f">10</span>'], a: 0,
+   fb: 'كتلة الماء المفقود = كتلة الملح المائي − كتلة الملح اللامائي = <span class="f">10 − 9.2 = 0.8 g</span>'},
   {q: 'مركبات تُستخدم في امتصاص الرطوبة:',
    o: ['القواعد', 'الأحماض', 'الأملاح المعدنية', 'الأملاح المائية'], a: 3,
    fb: 'بعض الأملاح المائية في صورتها اللامائية تمتص الماء من الهواء، لذلك تُستعمل مجففات.'},
@@ -123,7 +121,7 @@ const Q = [
 ];
 const L = ['أ', 'ب', 'ج', 'د'];
 const $ = id => document.getElementById(id);
-let i = 0, N = 30, scores = [], tm = null;
+let i = 0, scores = [], tm = null;
 function tone(f, d){ try{ const a = new (window.AudioContext||window.webkitAudioContext)(); const o = a.createOscillator(), g = a.createGain();
   o.frequency.value = f; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.15, a.currentTime);
   g.gain.exponentialRampToValueAtTime(.001, a.currentTime + d); o.start(); o.stop(a.currentTime + d);}catch(e){} }
@@ -139,13 +137,12 @@ function load(){
   $('qn').textContent = i + 1; $('qt').innerHTML = q.q;
   revealed = false; $('opts').classList.remove('done');
   $('opts').innerHTML = q.o.map((o, k) => `<div class="opt" data-k="${k}"><i>${L[k]}</i><span>${o}</span></div>`).join('');
-  $('fb').style.display = 'none'; $('count').style.display = 'none';
+  $('fb').style.display = 'none';
   $('show').classList.remove('hide'); $('next').classList.add('hide');
-  $('c').value = 0; $('c').max = N;
   $('next').textContent = i === Q.length - 1 ? 'النتيجة النهائية 🏆' : 'السؤال التالي ◀';
   timer();
 }
-$('go').onclick = () => { N = Math.max(1, +$('n').value || 30); i = 0; scores = []; $('start').classList.add('hide'); $('quiz').classList.remove('hide'); load(); };
+$('go').onclick = () => { i = 0; scores = []; $('start').classList.add('hide'); $('quiz').classList.remove('hide'); load(); };
 let revealed = false;
 function reveal(chosen){            // chosen = option index the teacher clicked, or null (reveal button)
   if (revealed) return; revealed = true;
@@ -158,27 +155,23 @@ function reveal(chosen){            // chosen = option index the teacher clicked
     ? '<div class="verdict" style="color:var(--green)">✔ إجابة صحيحة! أحسنتنّ 👏</div>'
     : '<div class="verdict" style="color:var(--red)">✘ ليست صحيحة… الإجابة الصحيحة (' + L[a] + ')</div>';
   $('fb').innerHTML = v + '💡 ' + Q[i].fb; $('fb').style.display = 'block';
-  $('count').style.display = 'flex'; $('show').classList.add('hide'); $('next').classList.remove('hide');
+  scores[i] = chosen === null ? null : (chosen === a ? 1 : 0);
+  $('show').classList.add('hide'); $('next').classList.remove('hide');
   if (chosen === null || chosen === a){ tone(880, .25); setTimeout(() => tone(1175, .3), 180); }
   else { tone(220, .35); }
 }
 $('show').onclick = () => reveal(null);
 $('opts').addEventListener('click', e => { const o = e.target.closest('.opt'); if (o) reveal(+o.dataset.k); });
-$('plus').onclick = () => $('c').value = Math.min(N, +$('c').value + 1);
-$('minus').onclick = () => $('c').value = Math.max(0, +$('c').value - 1);
-$('next').onclick = () => {
-  scores[i] = Math.min(N, Math.max(0, +$('c').value || 0));
-  if (++i < Q.length) load(); else result();
-};
+$('next').onclick = () => { if (++i < Q.length) load(); else result(); };
 function result(){
   $('quiz').classList.add('hide'); $('res').classList.remove('hide');
-  const pct = Math.round(scores.reduce((a, b) => a + b, 0) / (N * Q.length) * 100);
-  let k = 0; const t = setInterval(() => { $('pct').textContent = k + '%'; if (k++ >= pct) clearInterval(t); }, 18);
+  const right = scores.filter(x => x === 1).length;
+  const pct = Math.round(right / Q.length * 100);
+  $('pct').textContent = right + ' / ' + Q.length;
   $('msg').textContent = pct >= 80 ? 'رائع! أنتنّ خبيرات الأملاح المائية 🌟' : pct >= 60 ? 'أداء جيد… نراجع معاً الأسئلة الأقل نسبة 💪' : 'نحتاج مراجعة سريعة… لنعد إلى أهم الأفكار 📖';
-  $('bars').innerHTML = scores.map((s, j) => { const p = Math.round(s / N * 100);
-    const c = p >= 80 ? '#2E7D32' : p >= 60 ? '#F2B705' : '#E07A3F';
-    return `<div class="bar"><span>السؤال ${j + 1}</span><div class="track"><div class="fill" style="background:${c}" data-w="${p}"></div></div><span>${p}%</span></div>`; }).join('');
-  setTimeout(() => document.querySelectorAll('.fill').forEach(f => f.style.width = f.dataset.w + '%'), 60);
+  $('bars').innerHTML = Q.map((q, j) => { const s = scores[j];
+    const [t, c] = s === 1 ? ['✔ صحيحة', '#2E7D32'] : s === 0 ? ['✘ خاطئة', '#C62828'] : ['— كُشفت', '#5A6B7D'];
+    return `<div class="row"><span>السؤال ${j + 1}</span><b style="color:${c}">${t}</b></div>`; }).join('');
   if (pct >= 80) confetti();
 }
 $('again').onclick = () => { $('res').classList.add('hide'); $('start').classList.remove('hide'); };
@@ -192,8 +185,6 @@ function confetti(){
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' '){ if (!$('quiz').classList.contains('hide')){ (!$('show').classList.contains('hide') ? $('show') : $('next')).click(); e.preventDefault(); } }
-  if (e.key === 'ArrowUp' || e.key === '+') $('plus').click();
-  if (e.key === 'ArrowDown' || e.key === '-') $('minus').click();
 });
 </script>
 </body>
