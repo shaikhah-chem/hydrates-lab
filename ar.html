@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مختبر الواقع المعزز – الأملاح المائية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="models.js"></script>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+:root{--teal:#2E8B8B;--navy:#1F3A5F;--orange:#E07A3F;--peach:#FDF0E7;--mint:#A8D5D0;--bg:#F6FAF9;--red:#C00000;--green:#2E7D32}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tajawal,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--navy)}
+header{background:linear-gradient(135deg,var(--teal),#1E6F6F);color:#fff;padding:14px 16px 18px;text-align:center;border-radius:0 0 22px 22px}
+header h1{margin:0;font-size:1.35rem;font-weight:800}
+header p{margin:4px 0 0;opacity:.9;font-size:.95rem}
+.wrap{max-width:760px;margin:0 auto;padding:12px 14px 30px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 10px}
+.chip{flex:1 1 auto;border:2px solid var(--mint);background:#fff;color:var(--navy);border-radius:999px;padding:8px 14px;font:700 .95rem Tajawal,sans-serif;cursor:pointer}
+.chip.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.stage{position:relative;background:#fff;border:2px solid var(--mint);border-radius:20px;overflow:hidden}
+model-viewer{width:100%;height:56vh;min-height:320px;background:radial-gradient(circle at 50% 40%,#fff,#E6F4F2)}
+.status{position:absolute;top:10px;right:10px;left:10px;text-align:center;font-weight:800;font-size:1rem;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.9)}
+.arbtn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;border:0;border-radius:999px;padding:12px 20px;font:800 1rem Tajawal,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.row{display:flex;gap:10px;margin:12px 0}
+.btn{flex:1;border:0;border-radius:14px;padding:14px 10px;font:800 1.05rem Tajawal,sans-serif;color:#fff;cursor:pointer}
+.heat{background:var(--orange)}.water{background:var(--teal)}
+.btn:disabled{opacity:.4}
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0 12px;font-size:.9rem}
+.legend span{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--mint);border-radius:999px;padding:4px 10px}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15)}
+.card{background:#fff;border:2px solid var(--teal);border-radius:18px;padding:14px 16px;margin-top:12px}
+.card h2{margin:0 0 8px;font-size:1.1rem;color:var(--teal)}
+.card ol{margin:0;padding-inline-start:20px;line-height:1.9}
+.reveal{margin-top:10px;width:100%;background:var(--peach);border:2px dashed var(--orange);color:var(--navy);border-radius:14px;padding:12px;font:800 1rem Tajawal,sans-serif;cursor:pointer}
+.answer{display:none;margin-top:10px;background:#EEF7EE;border:2px solid var(--green);border-radius:14px;padding:12px;text-align:center;font-weight:800;color:var(--green);font-size:1.15rem;line-height:1.8}
+.answer .f{direction:ltr;display:inline-block;font-family:Calibri,Arial,sans-serif;font-size:1.35rem}
+.note{font-size:.85rem;color:#5A6B7D;text-align:center;margin-top:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🔬 مختبر الواقع المعزز – الأملاح المائية</h1>
+  <p>اختاري الملح… ضعيه على طاولتك… ثم سخّنيه!</p>
+</header>
+<div class="wrap">
+  <div class="chips" id="chips"></div>
+  <div class="stage">
+    <model-viewer id="mv" camera-controls touch-action="pan-y" auto-rotate shadow-intensity="1" exposure="1.05"
+      ar ar-modes="webxr quick-look scene-viewer" ar-scale="auto" camera-orbit="35deg 70deg auto"
+      alt="نموذج ثلاثي الأبعاد لملح مائي">
+      <button slot="ar-button" class="arbtn">📱 شاهديه على طاولتك (واقع معزز)</button>
+    </model-viewer>
+    <div class="status" id="status"></div>
+  </div>
+  <div class="row">
+    <button class="btn heat" id="heat">🔥 سخّني الملح</button>
+    <button class="btn water" id="addw" disabled>💧 أعيدي الماء</button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="card">
+    <h2>🎯 مهمة المجموعة</h2>
+    <ol>
+      <li>عدّي جزيئات الماء في النموذج (الجزيء = كرة <b style="color:#E53935">حمراء</b> + كرتان <b>بيضاوان</b>).</li>
+      <li>اضغطي «سخّني الملح»: ماذا حدث لجزيئات الماء؟ ولون القاعدة؟</li>
+      <li>اكتبي في ورقة المجموعة صيغة الملح المائي واسمه.</li>
+    </ol>
+    <button class="reveal" id="rev">🔓 تحقّقي من إجابتك</button>
+    <div class="answer" id="ans"></div>
+  </div>
+  <p class="note">إن لم يظهر زر الواقع المعزز في جوالك، دوّري النموذج بإصبعك وكبّريه بإصبعين.<br>كيمياء 1 – القسم 5-2 صيغ الأملاح المائية</p>
+</div>
+<script>
+const SALTS = {
+  co: {label: 'كلوريد الكوبلت (II)', hyd: 'CoCl2_6H2O', anh: 'CoCl2', n: 6,
+       f: 'CoCl<sub>2</sub>·6H<sub>2</sub>O', name: 'كلوريد الكوبلت (II) سداسي الماء',
+       hydTxt: 'ملح مائي – لونه زهري 🌸', anhTxt: 'ملح لامائي – لونه أزرق 🔵',
+       atoms: [['Co', '#F090A0', 'كوبلت'], ['Cl', '#1FD01F', 'كلور']]},
+  cu: {label: 'كبريتات النحاس (II)', hyd: 'CuSO4_5H2O', anh: 'CuSO4', n: 5,
+       f: 'CuSO<sub>4</sub>·5H<sub>2</sub>O', name: 'كبريتات النحاس (II) خماسية الماء',
+       hydTxt: 'ملح مائي – لونه أزرق 🔵', anhTxt: 'ملح لامائي – لونه أبيض ⚪',
+       atoms: [['Cu', '#C88033', 'نحاس'], ['S', '#FFD830', 'كبريت']]},
+  ba: {label: 'كلوريد الباريوم', hyd: 'BaCl2_2H2O', anh: 'BaCl2', n: 2,
+       f: 'BaCl<sub>2</sub>·2H<sub>2</sub>O', name: 'كلوريد الباريوم ثنائي الماء',
+       hydTxt: 'ملح مائي – بلورات عديمة اللون', anhTxt: 'ملح لامائي – مسحوق أبيض',
+       atoms: [['Ba', '#8E5CD9', 'باريوم'], ['Cl', '#1FD01F', 'كلور']]}
+};
+const mv = document.getElementById('mv'), st = document.getElementById('status');
+const heat = document.getElementById('heat'), addw = document.getElementById('addw');
+const ans = document.getElementById('ans');
+let cur = 'co', heated = false;
+function legend(s){
+  const base = [['O', '#FF2020', 'أكسجين'], ['H', '#F4F4F4', 'هيدروجين']];
+  document.getElementById('legend').innerHTML = s.atoms.concat(base)
+    .map(a => `<span><i class="dot" style="background:${a[1]}"></i>${a[2]} (${a[0]})</span>`).join('');
+}
+function show(){
+  const s = SALTS[cur];
+  mv.setAttribute('src', window.saltModel(heated ? s.anh : s.hyd));
+  st.textContent = heated ? '🔥 طُردت جزيئات الماء… ' + s.anhTxt : '💧 ' + s.hydTxt;
+  st.style.color = heated ? '#E07A3F' : '#2E8B8B';
+  heat.disabled = heated; addw.disabled = !heated;
+}
+function pick(k){
+  cur = k; heated = false; ans.style.display = 'none';
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.k === k));
+  legend(SALTS[k]); show();
+}
+document.getElementById('chips').innerHTML = Object.entries(SALTS)
+  .map(([k, s]) => `<button class="chip" data-k="${k}">${s.label}</button>`).join('');
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => pick(c.dataset.k));
+heat.onclick = () => { heated = true; show(); };
+addw.onclick = () => { heated = false; show(); };
+document.getElementById('rev').onclick = () => {
+  const s = SALTS[cur];
+  ans.innerHTML = `عدد جزيئات الماء = ${s.n}<br><span class="f">${s.f}</span><br>${s.name}`;
+  ans.style.display = 'block';
+};
+pick('co');
+</script>
+</body>
+</html>
