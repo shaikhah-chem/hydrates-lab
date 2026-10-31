@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:Tajawal,"Segoe UI",Tahoma,sans-serif;background:var(--bg) radial-gradient(circle at 10% 10%,#E6F4F2 0,transparent 40%),radial-gradient(circle at 90% 90%,#FDF0E7 0,transparent 40%);color:var(--navy);display:flex;flex-direction:column}
-.top{display:flex;align-items:center;justify-content:space-between;padding:14px 28px}
+.top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:14px 28px}
 .badge{background:var(--orange);color:#fff;border-radius:999px;padding:8px 22px;font-weight:800;font-size:1.25rem;box-shadow:0 3px 0 #B95E2A}
 .tag{background:#fff;border:2px solid var(--mint);border-radius:999px;padding:6px 16px;font-weight:700}
 main{flex:1;display:flex;align-items:center;justify-content:center;padding:0 28px 24px}
@@ -36,7 +36,13 @@ input[type=number]{width:100px;font:800 1.4rem Tajawal,sans-serif;text-align:cen
 .opt i{font-style:normal;background:#fff;border:2px solid var(--teal);color:var(--teal);border-radius:50%;width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;font-weight:800}
 .opt.ok{background:var(--lgreen);border-color:var(--green);color:var(--green);transform:scale(1.03)}
 .opt.ok i{background:var(--green);color:#fff;border-color:var(--green)}
+.opt{cursor:pointer}
+.opt:hover{border-color:var(--teal)}
 .opt.no{opacity:.35}
+.opt.bad{background:#FDECEA;border-color:var(--red);color:var(--red);opacity:1}
+.opt.bad i{background:var(--red);color:#fff;border-color:var(--red)}
+.done .opt{cursor:default}
+.verdict{font-size:1.5rem;font-weight:800;margin-bottom:6px}
 .f{direction:ltr;unicode-bidi:isolate;display:inline-block;white-space:nowrap;font-family:Calibri,Arial,sans-serif}
 .fb{display:none;margin-top:18px;background:var(--peach);border:2px solid var(--orange);border-radius:18px;padding:14px 18px;font-size:1.3rem;font-weight:700;line-height:1.7}
 .ctrl{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:16px;flex-wrap:wrap}
@@ -131,6 +137,7 @@ function timer(){
 function load(){
   const q = Q[i];
   $('qn').textContent = i + 1; $('qt').innerHTML = q.q;
+  revealed = false; $('opts').classList.remove('done');
   $('opts').innerHTML = q.o.map((o, k) => `<div class="opt" data-k="${k}"><i>${L[k]}</i><span>${o}</span></div>`).join('');
   $('fb').style.display = 'none'; $('count').style.display = 'none';
   $('show').classList.remove('hide'); $('next').classList.add('hide');
@@ -139,13 +146,24 @@ function load(){
   timer();
 }
 $('go').onclick = () => { N = Math.max(1, +$('n').value || 30); i = 0; scores = []; $('start').classList.add('hide'); $('quiz').classList.remove('hide'); load(); };
-$('show').onclick = () => {
-  clearInterval(tm);
-  document.querySelectorAll('.opt').forEach(o => o.classList.add(+o.dataset.k === Q[i].a ? 'ok' : 'no'));
-  $('fb').innerHTML = '💡 ' + Q[i].fb; $('fb').style.display = 'block';
+let revealed = false;
+function reveal(chosen){            // chosen = option index the teacher clicked, or null (reveal button)
+  if (revealed) return; revealed = true;
+  clearInterval(tm); $('opts').classList.add('done');
+  const a = Q[i].a;
+  document.querySelectorAll('.opt').forEach(o => { const k = +o.dataset.k;
+    o.classList.add(k === a ? 'ok' : (k === chosen ? 'bad' : 'no')); });
+  let v = '';
+  if (chosen !== null) v = chosen === a
+    ? '<div class="verdict" style="color:var(--green)">✔ إجابة صحيحة! أحسنتنّ 👏</div>'
+    : '<div class="verdict" style="color:var(--red)">✘ ليست صحيحة… الإجابة الصحيحة (' + L[a] + ')</div>';
+  $('fb').innerHTML = v + '💡 ' + Q[i].fb; $('fb').style.display = 'block';
   $('count').style.display = 'flex'; $('show').classList.add('hide'); $('next').classList.remove('hide');
-  tone(880, .25); setTimeout(() => tone(1175, .3), 180);
-};
+  if (chosen === null || chosen === a){ tone(880, .25); setTimeout(() => tone(1175, .3), 180); }
+  else { tone(220, .35); }
+}
+$('show').onclick = () => reveal(null);
+$('opts').addEventListener('click', e => { const o = e.target.closest('.opt'); if (o) reveal(+o.dataset.k); });
 $('plus').onclick = () => $('c').value = Math.min(N, +$('c').value + 1);
 $('minus').onclick = () => $('c').value = Math.max(0, +$('c').value - 1);
 $('next').onclick = () => {
